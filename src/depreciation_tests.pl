@@ -1,3 +1,9 @@
+/*
+
+many tests are failing. A first good step may be to replace the round()'s and =:='s with floats_close_enough from numbers.pl
+
+*/
+
 :- use_module(event_calculus,[
         depreciation_value/6,
         depreciation_rate/6,
@@ -11,7 +17,7 @@
     depreciation_pool_between_two_dates/5,
     written_down_value/5,
     depreciation_between_two_dates/5,
-    profit_and_loss/5]).
+    profit_and_loss/6]).
 
 :- begin_tests(depreciation).
 
@@ -374,7 +380,7 @@ test(profit_and_loss_1):-
     asset(Asset_id,Asset_cost,Start_date,_),
     Termination_date = date(2019,7,7),
     Termination_value = 500,
-    profit_and_loss(Asset_id, Termination_value, Termination_date, _, Profit_and_loss),
+    profit_and_loss(Asset_id, Termination_value, Termination_date, _, _,Profit_and_loss),
     depreciation_between_start_date_and_other_date(Asset_cost,diminishing_value,Start_date,
         Termination_date,Asset_id,_,1,false,_,0,Total_depreciation_value),
     Correct_profit_and_loss is Termination_value - (Asset_cost - Total_depreciation_value),
@@ -387,7 +393,7 @@ test(profit_and_loss_2, fail):-
     asset(Asset_id,Asset_cost,Start_date,_),
     Termination_date = date(2019,7,7),
     Termination_value = 500,
-    profit_and_loss(Asset_id, Termination_value, Termination_date, Method, Profit_and_loss),
+    profit_and_loss(Asset_id, Termination_value, Termination_date, Method, _,Profit_and_loss),
     depreciation_between_start_date_and_other_date(Asset_cost,Method,Start_date,
         Termination_date,Asset_id,_,1,false,_,0,Total_depreciation_value),
     Correct_profit_and_loss is Termination_value - (Asset_cost - Total_depreciation_value),

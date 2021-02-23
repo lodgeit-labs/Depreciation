@@ -2,6 +2,9 @@
 
 ISSUES THAT NEED REVIEW:
 
+ISSUE 0:
+tests are failing, probably because of some small changes
+
 ISSUE 1:
 * one thing that confuses me is that it seems that if you have an asset, let's say purchased in 2010, and at 2017 you add it to a pool, then depreciation_pool_from_start will compute with the full purchase price of the asset, like if it wasnt already depreciating before it was added to the pool.
 - I think I run that with Andrew and as far as I remember that didnt work that way...
@@ -23,7 +26,7 @@ depreciationAsset produces two life periods, the first has 1 day
 
 ISSUE 3
 
-Concept of capital gain(below).
+fix profit_and_loss capital gain calculation(below) (was added recently).
 
 */
 
@@ -229,14 +232,14 @@ profit_and_loss(Asset_id, Asset_sell_price, Written_down_date, Method, Recup, Ca
 	asset(Asset_id,Asset_cost,_,_),
 	written_down_value(Asset_id, Written_down_date,Method,_,Written_down_value),
 
-/*fixme:
- Concept of capital gain is as follows
-Buy an asset for 10
-Deprecate to a written down value of 8. I.e accumulated depreciation is 2.
-Sell for 12.
-I've a capital gain of 2 and a depreciation recoupment of 2.
-Any proceeds over the cost base is a capital gain.
-*/
+	/*fixme:
+	 Concept of capital gain is as follows
+	Buy an asset for 10
+	Deprecate to a written down value of 8. I.e accumulated depreciation is 2.
+	Sell for 12.
+	I've a capital gain of 2 and a depreciation recoupment of 2.
+	Any proceeds over the cost base is a capital gain.
+	*/
 
 	Capital_gain is Asset_sell_price - Asset_cost,
 	Recup is Written_down_value - Asset_cost.
