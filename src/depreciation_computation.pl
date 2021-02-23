@@ -1,32 +1,29 @@
 /*
-ATO: Days held can be 366 for a leap year. (for both prime_cost and diminishing_value)
-	https://www.ato.gov.au/business/depreciation-and-capital-expenses-and-allowances/general-depreciation-rules---capital-allowances/prime-cost-(straight-line)-and-diminishing-value-methods
-
-diminishing_value:
-The base value reduces each year by the decline in the value of the asset. This means the base value for the second year will be $48,000; that is, $80,000 minus the $32,000 decline in value in the first year.
-
-note that when we calculato depreciation_between_two_dates, we calculate the depreciation up to the beginning date, calculate base value from that, then calculate the rest. This is different from calculating the total depreciation over the income year of beginning date, and perhaps calculating the depreciation from beginning date until the end of the income year proportionally
-
-
----
 
 ISSUES THAT NEED REVIEW:
 
-
+ISSUE 1:
 * one thing that confuses me is that it seems that if you have an asset, let's say purchased in 2010, and at 2017 you add it to a pool, then depreciation_pool_from_start will compute with the full purchase price of the asset, like if it wasnt already depreciating before it was added to the pool.
-* I think I run that with Andrew and as far as I remember that didnt work that way...
+- I think I run that with Andrew and as far as I remember that didnt work that way...
+- I have this comment in  depreciationAsset(...) predicate: %reduce end value even if not in specified pool, so that when in pool the begin value is correct
+so when asked while in Pool, even if it starts later in pool, the calculation begins over the depreciated value outside the pool
+* It can be seen by taking the default depreciation template and running it, then changing car456 purchase date and running again.
+ that doesn't sound right, right? tnat you can only add an asset to the pool at beginning of income year, but it spends a day outside of the pool
+- That can be changed easily, it was only a convention in event calculus (any event only makes something hold from the next day on forward), I had doubt too if it was the best option so I get you!
 
+ISSUE 2
 * another thing that doesnt seem right is that if asset is added to pool on 01/07/xxxx,
 depreciationAsset produces two life periods, the first has 1 day
 * If it is added on the first day it is only in the pool in the next day, so first day is outside the pool with other depreciation rules
-I have this comment in  depreciationAsset(...) predicate: %reduce end value even if not in specified pool, so that when in pool the begin value is correct
-so when asked while in Pool, even if it starts later in pool, the calculation begins over the depreciated value outside the pool
+- I don't understand it either... I have to check it with more time... Also, the depreciation module needs a refactoring since I wasnt using event calculus to its fullest in it... afterward I have improved event calculus to fully take advantage of library(clpfd) and shared it with Andrew
+	the code would look simpler with this and more understandable
+^ this means that we have an improved "event calculus" code somewhere, but have not rewritten this depreciation code to make use of it.
 
-* It can be seen by taking the default depreciation template and running it, then changing car456 purchase date and running again
- that doesn't sound right, right? tnat you can only add an asset to the pool at beginning of income year, but it spends a day outside of the pool
-* That can be changed easily, it was only a convention in event calculus (any event only makes something hold from the next day on forward), I had doubt too if it was the best option so I get you!
 
-also: Concept of capital gain(below).
+
+ISSUE 3
+
+Concept of capital gain(below).
 
 */
 
@@ -73,9 +70,8 @@ depreciation_between_start_date_and_other_date(
 
 	/*
 	i'm wondering about the "1" for day here
-	I don't understand it either... I have to check it with more time... Also, the depreciation module needs a refactoring since I wasnt using event calculus to its fullest in it... afterward I have improved event calculus to fully take advantage of library(clpfd) and shared it with Andrew
-	the code would look simpler with this and more understandable
 	*/
+
 	day_diff(Begin_accounting_date, date(From_year, From_Month, 1), T1),
 
 	absolute_day(Begin_accounting_date, Begin_accounting_days),
@@ -257,3 +253,14 @@ check_day_difference_validity(Days_difference) :-
 		false,/* todo,is failing ever desired (probably not)? */throw_string('Request date is earlier than the invest in date.')
 	).
 
+
+/*
+ATO: Days held can be 366 for a leap year. (for both prime_cost and diminishing_value)
+	https://www.ato.gov.au/business/depreciation-and-capital-expenses-and-allowances/general-depreciation-rules---capital-allowances/prime-cost-(straight-line)-and-diminishing-value-methods
+
+diminishing_value:
+The base value reduces each year by the decline in the value of the asset. This means the base value for the second year will be $48,000; that is, $80,000 minus the $32,000 decline in value in the first year.
+
+note that when we calculato depreciation_between_two_dates, we calculate the depreciation up to the beginning date, calculate base value from that, then calculate the rest. This is different from calculating the total depreciation over the income year of beginning date, and perhaps calculating the depreciation from beginning date until the end of the income year proportionally
+
+*/
