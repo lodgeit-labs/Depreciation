@@ -27,6 +27,8 @@ test(prime_cost0, all(x=[x])) :-
 	depreciation_value(prime_cost, 1000, 800, 200, 0.2, Depreciation_value),
 	assertion(floats_close_enough(Depreciation_value, 109.58904109589042)).
 
+	blabla
+
 test(depreciation_value_prime_cost) :-
     Method = prime_cost,
     Asset_cost = 1000,
