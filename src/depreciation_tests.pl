@@ -21,6 +21,12 @@ many tests are failing. A first good step may be to replace the round()'s and =:
 
 :- begin_tests(depreciation).
 
+
+test(prime_cost0, all(x=[x])) :-
+	% Depreciation_value is Asset_cost * (Days_held / 365) * Depreciation_rate
+	depreciation_value(prime_cost, 1000, 800, 200, 0.2, Depreciation_value),
+	assertion(floats_close_enough(Depreciation_value, 109.58904109589042)).
+
 test(depreciation_value_prime_cost) :-
     Method = prime_cost,
     Asset_cost = 1000,
@@ -28,7 +34,7 @@ test(depreciation_value_prime_cost) :-
     Days_held = 200,
     Depreciation_rate = 20,
     Correct_depreciation_value is Asset_cost * (Days_held / 365) * Depreciation_rate / 100,
-    depreciation_value(Method, Asset_cost, Asset_base_value, Days_held, 
+    depreciation_value(Method, Asset_cost, Asset_base_value, Days_held,
         Depreciation_rate, Depreciation_value),
     assertion(Depreciation_value == Correct_depreciation_value).
 
@@ -39,7 +45,7 @@ test(depreciation_value_dimishing_value):-
     Days_held = 200,
     Depreciation_rate = 20,
     Correct_depreciation_value is Asset_base_value * (Days_held / 365) * Depreciation_rate / 100,
-    depreciation_value(Method, Asset_cost, Asset_base_value, Days_held, Depreciation_rate, 
+    depreciation_value(Method, Asset_cost, Asset_base_value, Days_held, Depreciation_rate,
         Depreciation_value),
     assertion(Depreciation_value == Correct_depreciation_value).
 
@@ -50,7 +56,7 @@ test(depreciation_value_prime_cost_fail,fail) :-
     Days_held = 367,
     Depreciation_rate = 20,
     Correct_depreciation_value is Asset_cost * (Days_held / 365) * Depreciation_rate / 100,
-    depreciation_value(Method, Asset_cost, Asset_base_value, Days_held, Depreciation_rate, 
+    depreciation_value(Method, Asset_cost, Asset_base_value, Days_held, Depreciation_rate,
         Depreciation_value),
     assertion(Depreciation_value == Correct_depreciation_value).
 
@@ -61,11 +67,11 @@ test(depreciation_value_dimishing_value_fail,fail):-
     Days_held = 400,
     Depreciation_rate = 20,
     Correct_depreciation_value is Asset_base_value * (Days_held / 365) * Depreciation_rate / 100,
-    depreciation_value(Method, Asset_cost, Asset_base_value, Days_held, Depreciation_rate, 
+    depreciation_value(Method, Asset_cost, Asset_base_value, Days_held, Depreciation_rate,
         Depreciation_value),
     assertion(Depreciation_value == Correct_depreciation_value).
 
-test(depreciation_rate_prime_cost) :-
+test(depreciation_rate_prime_cost, ) :-
     Method = prime_cost,
     Asset_id = car123,
     Effective_life_years = 5,
@@ -400,4 +406,4 @@ test(profit_and_loss_2, fail):-
     assertion(Correct_profit_and_loss == Profit_and_loss).
 
 :- end_tests(depreciation).
-:- run_tests.
+
