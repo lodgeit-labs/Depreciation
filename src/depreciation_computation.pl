@@ -160,7 +160,7 @@ depreciation_pool_from_start(Pool,To_date,Method,Total_depreciation):-
 		depreciation_pool_from_start2(To_date,Method,Pool,Depreciation_value),
 		Depreciation_values_lst
 	),
-	sum_list(Depreciation_values_lst,Total_depreciation). 
+	sum_list(Depreciation_values_lst,Total_depreciation).
 
 depreciation_pool_from_start2(To_date,Method,Pool,Depreciation_value) :-
 	%asset(car123,1000,date(2017,5,1),5).
@@ -213,12 +213,12 @@ written_down_value(Asset_id, Written_down_date, Method, Life, Written_down_value
 	depreciation_between_start_date_and_other_date(
 		Asset_cost,
 		Method,
-		Start_date, 
-		Written_down_date, 
+		Start_date,
+		Written_down_date,
 		Asset_id,
 		Life,
 		1,/* this is in the sense of first year of ownership*/
-		false, 
+		false,
 		_,
 		0,
 		Total_depreciation_value

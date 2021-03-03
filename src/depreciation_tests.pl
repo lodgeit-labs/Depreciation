@@ -8,6 +8,8 @@ many tests are failing. A first good step may be to replace the round()'s and =:
         depreciation_value/6,
         depreciation_rate/6,
         depreciationAsset/12,
+		days_from_begin_accounting/2,
+        assert_asset/4,
         asset/4,
         happens/2]).
 
@@ -25,9 +27,8 @@ many tests are failing. A first good step may be to replace the round()'s and =:
 test(prime_cost0, all(x=[x])) :-
 	% Depreciation_value is Asset_cost * (Days_held / 365) * Depreciation_rate
 	depreciation_value(prime_cost, 1000, 800, 200, 0.2, Depreciation_value),
-	assertion(floats_close_enough(Depreciation_value, 109.58904109589042)).
+	assertion(floats_close_enough(Depreciation_value, 1.0958904109589042)).
 
-	blabla
 
 test(depreciation_value_prime_cost) :-
     Method = prime_cost,
@@ -39,6 +40,7 @@ test(depreciation_value_prime_cost) :-
     depreciation_value(Method, Asset_cost, Asset_base_value, Days_held,
         Depreciation_rate, Depreciation_value),
     assertion(Depreciation_value == Correct_depreciation_value).
+
 
 test(depreciation_value_dimishing_value):-
     Method = diminishing_value,
@@ -73,12 +75,14 @@ test(depreciation_value_dimishing_value_fail,fail):-
         Depreciation_value),
     assertion(Depreciation_value == Correct_depreciation_value).
 
-test(depreciation_rate_prime_cost, ) :-
+
+test(depreciation_rate_prime_cost, all(x=[x])) :-
     Method = prime_cost,
     Asset_id = car123,
     Effective_life_years = 5,
     depreciation_rate(Asset_id, Method,_,_,Effective_life_years, Rate),
     assertion(Rate == 20).
+
 
 test(depreciation_rate_diminishing_value) :-
     Method = diminishing_value,
@@ -88,7 +92,7 @@ test(depreciation_rate_diminishing_value) :-
     depreciation_rate(Asset_id, Method,_,Start_date,Effective_life_years, Rate),
     assertion(Rate == 40).
 
-test(depreciation_rate_general_pool) :-
+test(depreciation_rate_general_pool, all(x=[x])) :-
     Asset_id = general_pool,
     Effective_life_years = 5,
     Start_date = date(2017,1,1),
@@ -106,24 +110,29 @@ test(depreciation_rate_general_pool_fail, fail) :-
     depreciation_rate(Asset_id, Method,Year_from_start,Start_date,Effective_life_years, Rate),
     assertion(Rate == 15).
 
-/*
-% Transfer car123 to general pool in date(2017,7,1)
-% days_from_begin_accounting(date(2017,7,1),Days).
-% Days = 10013
-happens(transfer_asset_to_pool(car123,general_pool),10013).
-% Transfer car456 to general pool in date(2015,7,1)
-% days_from_begin_accounting(date(2015,7,1),Days).
-% Days = 9343
-happens(transfer_asset_to_pool(car456,general_pool),9343).
-% Remove car123 from general pool in date(2021,6,1) by disposal
-% days_from_begin_accounting(date(2021,6,1),Days).
-% Days = 11474
-happens(remove_asset_from_pool(car123,general_pool),11474).
-% Remove car456 from general pool in date(2020,7,31) by disposal
-% days_from_begin_accounting(date(2020,7,31),Days).
-% Days = 11169
-happens(remove_asset_from_pool(car456,general_pool),11169).
-*/
+
+:-
+	days_from_begin_accounting(date(2017,05,01), D1),
+	days_from_begin_accounting(date(2015,03,16), D2),
+	assert_asset(car123,1000,D1,5),
+	assert_asset(car456,2000,D2,8).
+	% Transfer car123 to general pool in date(2017,7,1)
+	% days_from_begin_accounting(date(2017,7,1),Days).
+	% Days = 10013
+	assert_event(happens(transfer_asset_to_pool(car123,general_pool),10013)).
+	% Transfer car456 to general pool in date(2015,7,1)
+	% days_from_begin_accounting(date(2015,7,1),Days).
+	% Days = 9343
+	assert_event(happens(transfer_asset_to_pool(car456,general_pool),9343)).
+	% Remove car123 from general pool in date(2021,6,1) by disposal
+	% days_from_begin_accounting(date(2021,6,1),Days).
+	% Days = 11474
+	assert_event(happens(remove_asset_from_pool(car123,general_pool),11474)).
+	% Remove car456 from general pool in date(2020,7,31) by disposal
+	% days_from_begin_accounting(date(2020,7,31),Days).
+	% Days = 11169
+	assert_event(happens(remove_asset_from_pool(car456,general_pool),11169)).
+
 
 test(depreciationAsset_all_life_1):-
     Asset_id = car123,
@@ -134,11 +143,13 @@ test(depreciationAsset_all_life_1):-
     Year_of_depreciation = 1,
     depreciationAsset(Asset_id,T1,T2,Begin_value,End_value,Method,Year_of_depreciation,
         Life,false,_,0,Final_depreciation_value),
-    assertion(Life == [[1000,not_in_pool(car123),10000,10044,885.6776881215987,48.21917808219178,40],
-        [951.7808219178082,in_pool(car123,general_pool),10044,10213,885.6776881215987,66.10313379620942,15]]),
-    assertion(Final_depreciation_value=:=114.3223118784012),
+    round_term(Life, Life_r),
+    round_term([[1000,not_in_pool(car123),10000,10044,885.6776881215987,48.21917808219178,40],
+        [951.7808219178082,in_pool(car123,general_pool),10044,10213,885.6776881215987,66.10313379620942,15]], Expected_r),
+    assertion(Life_r == Expected_r),
+    assertion(floats_close_enough(Final_depreciation_value,114.3223118784012)),
     Correct_end_value is Begin_value - Final_depreciation_value,
-    assertion(round(Correct_end_value) =:= round(End_value)).
+    assertion(floats_close_enough(Correct_end_value, End_value)).
 
 test(depreciationAsset_all_life_2):-
     Asset_id = car456,
@@ -406,6 +417,8 @@ test(profit_and_loss_2, fail):-
         Termination_date,Asset_id,_,1,false,_,0,Total_depreciation_value),
     Correct_profit_and_loss is Termination_value - (Asset_cost - Total_depreciation_value),
     assertion(Correct_profit_and_loss == Profit_and_loss).
+
+
 
 :- end_tests(depreciation).
 
