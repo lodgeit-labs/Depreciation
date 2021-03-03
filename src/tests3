@@ -40,7 +40,6 @@ test(depreciationAsset_all_life_2,[all(x=[x])]):-
     Correct_end_value is Begin_value - Final_depreciation_value,
     assertion(floats_close_enough(Correct_end_value,End_value)).
 
-%%%
 test(depreciationAsset_all_life_3,[all(x=[x])]):-
     Asset_id = car123,
     T1 = 9982,
@@ -99,53 +98,17 @@ test(depreciationAsset_only_in_pool_2,[all(x=[x])]):-
 
 
 test(depreciation_between_start_date_and_other_date_while_in_pool_1,[all(x=[x])]):-
-    /* Parameters of predicate
-    Initial_value, 							% value at start of year / Asset Base Value
-    Method, 								% Diminishing Value / Prime Cost
-    date(From_year, From_Month, From_day),
-    To_date,								% date for which depreciation should be computed
-    Asset_id,								% Asset
-    Rates,
-    Depreciation_year, 						% 1,2,3...
-    While_in_pool,
-    What_pool,
-    Initial_depreciation_value,
-    Total_depreciation_value*/
     depreciation_between_start_date_and_other_date(1000,diminishing_value,date(2017,6,1),
         date(2019,10,2),car123,_,1,true,general_pool,0,Total_depreciation_value),
     assertion(floats_close_enough(Total_depreciation_value, 546.7114669107006)).
 
 test(depreciation_between_start_date_and_other_date_while_in_pool_2,[all(x=[x])]):-
-    /* Parameters of predicate
-    Initial_value, 							% value at start of year / Asset Base Value
-    Method, 								% Diminishing Value / Prime Cost
-    date(From_year, From_Month, From_day),  % Start date
-    To_date,								% date for which depreciation should be computed
-    Asset_id,								% Asset
-    Rates,
-    Depreciation_year, 						% 1,2,3...
-    While_in_pool,
-    What_pool,
-    Initial_depreciation_value,
-    Total_depreciation_value*/
     depreciation_between_start_date_and_other_date(2000,diminishing_value,date(2015,3,16),
         date(2019,10,2),car456,_,1,true,general_pool,0,Total_depreciation_value),
     assertion(floats_close_enough(Total_depreciation_value, 1556.4080604522424)).
 
 
 test(depreciation_between_start_date_and_other_date_while_in_pool_3):-
-    /* Parameters of predicate
-    Initial_value, 							% value at start of year / Asset Base Value
-    Method, 								% Diminishing Value / Prime Cost
-    date(From_year, From_Month, From_day),
-    To_date,								% date for which depreciation should be computed
-    Asset_id,								% Asset
-    Rates,
-    Depreciation_year, 						% 1,2,3...
-    While_in_pool,
-    What_pool,
-    Initial_depreciation_value,
-    Total_depreciation_value*/
     Asset_id = car123,
     asset(Asset_id,Cost,Start_date,_),
     depreciation_between_start_date_and_other_date(Cost,diminishing_value,Start_date,
@@ -153,18 +116,6 @@ test(depreciation_between_start_date_and_other_date_while_in_pool_3):-
     assertion(floats_close_enough(Total_depreciation_value, 423.32831447468874)).
 
 test(depreciation_between_start_date_and_other_date_while_in_pool_4):-
-    /* Parameters of predicate
-    Initial_value, 							% value at start of year / Asset Base Value
-    Method, 								% Diminishing Value / Prime Cost
-    date(From_year, From_Month, From_day),  % Start date
-    To_date,								% date for which depreciation should be computed
-    Asset_id,								% Asset
-    Rates,
-    Depreciation_year, 						% 1,2,3...
-    While_in_pool,
-    What_pool,
-    Initial_depreciation_value,
-    Total_depreciation_value*/
     Asset_id = car456,
     asset(Asset_id,Cost,Start_date,_),
     depreciation_between_start_date_and_other_date(Cost,diminishing_value,Start_date,

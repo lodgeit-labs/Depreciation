@@ -8,22 +8,22 @@
         asset/4,
         assert_asset/4,
         assert_event/2,
-        happens/2
+        happens/2,
+        ec_cleanup/0,
+        begin_accounting_date/1
     ]).
 
 
 :- use_module(library(clpfd)).
 
-%:- use_module(days, [day_diff/3,add_days/3]).
-
-/*
-:- use_module(depreciation_computation, [
-    depreciation_rate/6,
-    depreciation_value/6]).
-*/
 
 :- dynamic (asset/4).
 :- dynamic happens/2.
+
+
+ec_cleanup :-
+	retractall(happens(_,_)),
+	retractall(asset(_,_,_,_)).
 
 assert_asset(Asset_id,Asset_cost,Start_date,Effective_life_years) :-
 	assertz(asset(Asset_id,Asset_cost,Start_date,Effective_life_years)).
@@ -31,8 +31,10 @@ assert_asset(Asset_id,Asset_cost,Start_date,Effective_life_years) :-
 assert_event(Event, Days) :-
 	assertz(happens(Event, Days)).
 
+
 begin_accounting_date(date(1990,1,1)).
 begin_income_year(date(_,7,1)).
+
 
 % Define constraint in days, max 100000 days
 time(T):- T #>= -1, T #=< 100000.
@@ -151,9 +153,10 @@ depreciation_rate(Asset, diminishing_value,_,Start_date,Effective_life_years, Ra
     (	Start_date @< date(2006,5,10)
     	% If you started to hold the asset before 10 May 2006, the formula for the diminishing value method is:
 		% Base value × (days held ÷ 365) × (150% ÷ asset’s effective life)
-     -> Rate is 100 * 1.5 / Effective_life_years
+     -> Rate is 150 / Effective_life_years
      	% otherwise:
-     ;	Rate is 100 * 2 / Effective_life_years).
+     ;	Rate is 200 / Effective_life_years).
+
 % Depreciation for Assets in Pools
 % Depreciation rate for General Pool
 /*
@@ -170,19 +173,21 @@ depreciation_rate(software_pool,_, 2, Start_date,_,Rate):- (Start_date @>= date(
 depreciation_rate(software_pool,_, 3, Start_date,_,Rate):- (Start_date @>= date(2015,7,1) -> Rate is 30; Rate is 40).
 depreciation_rate(software_pool,_, 4, Start_date,_,Rate):- (Start_date @>= date(2015,7,1) -> Rate is 30; Rate is 20).
 depreciation_rate(software_pool,_, 5, Start_date,_,Rate):- (Start_date @>= date(2015,7,1) -> Rate is 10; Rate is 0).
+
+
 % Depreciation rate for Low Value Pool
 /*
 You calculate the depreciation of all the assets in the low-value pool at the annual rate of 37.5%.
 If you acquire an asset and allocate it to the pool during an income year, you calculate its deduction at a rate of 18.75%
 (that is, half the pool rate) in that first year.
 This rate applies regardless of at what point during the year you allocate the asset to the pool.
-TODO:If asset is transfered to low value pool, then it can't leave the pool afterwards.
 Only low value or low cost assets can be allocated to a Low Value Pool
 */
 depreciation_rate(low_value_pool,_,1,_,_,18.75).
 depreciation_rate(low_value_pool,_,Year,_,_,37.5):- Year > 1.
 % For debugging
 %start:-depreciationInInterval(car123,1000,date(2017,8,1),0,20,800,_,diminishing_value,1,5,Result,0,Total_depreciation).
+
 
 pool(general_pool).
 pool(low_value_pool).

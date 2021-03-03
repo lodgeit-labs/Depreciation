@@ -1,11 +1,11 @@
 :- use_module(event_calculus,[
-        depreciation_value/6,
-        depreciation_rate/6,
-        depreciationAsset/12,
-		days_from_begin_accounting/2,
-        assert_asset/4,
-        assert_event/2,
-        asset/4
+	depreciation_value/6,
+	depreciation_rate/6,
+	depreciationAsset/12,
+	days_from_begin_accounting/2,
+	assert_asset/4,
+	assert_event/2,
+	asset/4
 ]).
 
 :- begin_tests(depreciation_rate).
