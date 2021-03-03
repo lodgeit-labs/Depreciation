@@ -1,0 +1,62 @@
+test(depreciation_pool_from_start_1):-
+    depreciation_pool_from_start(general_pool,date(2019,2,2),diminishing_value,Total_depreciation),
+    % From above, the pool should add the depreciation values of each asset for the same period while in pool
+    Correct_total_depreciation is 1858.9925927632983,
+    assertion(floats_close_enough(Total_depreciation, Correct_total_depreciation)).
+
+test(depreciation_pool_from_start_2):-
+    depreciation_pool_from_start(low_value_pool,date(2019,2,2),diminishing_value,Total_depreciation),
+    % Not any asset was placed in the low value pool so it should be zero
+    Correct_total_depreciation is 0,
+    assertion(floats_close_enough(Total_depreciation, Correct_total_depreciation)).
+
+test(depreciation_pool_from_start_3):-
+    depreciation_pool_from_start(general_pool,date(2013,2,2),diminishing_value,Total_depreciation),
+    % Not any asset was in the pool before this date so it should be zero
+    Correct_total_depreciation is 0,
+    assertion(floats_close_enough(Total_depreciation, Correct_total_depreciation)).
+
+test(depreciation_pool_from_start_5):-
+    depreciation_pool_from_start(general_pool,date(2020,2,2),diminishing_value,Total_depreciation),
+    % From above, the pool should add the depreciation values of each asset for the same period while in pool
+    Correct_total_depreciation is 2201.2948149343088,
+    assertion(floats_close_enough(Total_depreciation, Correct_total_depreciation)).
+
+test(depreciation_pool_between_two_dates_1):-
+    depreciation_pool_between_two_dates(general_pool,date(2019,2,2),date(2020,2,2),diminishing_value,Total_depreciation),
+    Correct_total_depreciation is 342.3022221710105,
+    assertion(floats_close_enough(Total_depreciation, Correct_total_depreciation)).
+
+test(depreciation_between_two_dates_1):-
+    Asset_id = car456,
+    From_date = date(2017,6,1),
+    To_date = date(2019,2,2),
+    Method = diminishing_value,
+    depreciation_between_two_dates(Asset_id, From_date, To_date, Method, Depreciation_value),
+    Correct_depreciation_value is 425.3388570911104,
+    assertion(floats_close_enough(Correct_depreciation_value, Depreciation_value)).
+
+test(profit_and_loss_1):-
+    Asset_id = car123,
+    asset(Asset_id,Asset_cost,Start_date,_),
+    Termination_date = date(2019,7,7),
+    Termination_value = 500,
+    profit_and_loss(Asset_id, Termination_value, Termination_date, _, _,Profit_and_loss),
+    depreciation_between_start_date_and_other_date(Asset_cost,diminishing_value,Start_date,
+        Termination_date,Asset_id,_,1,false,_,0,Total_depreciation_value),
+    Correct_profit_and_loss is Termination_value - (Asset_cost - Total_depreciation_value),
+    assertion(floats_close_enough(Correct_profit_and_loss, Profit_and_loss)).
+
+test(profit_and_loss_2, fail):-
+    % It should fail since the asset was placed in a general pool that forces a diminishing value method
+    Method = prime_cost,
+    Asset_id = car123,
+    asset(Asset_id,Asset_cost,Start_date,_),
+    Termination_date = date(2019,7,7),
+    Termination_value = 500,
+    profit_and_loss(Asset_id, Termination_value, Termination_date, Method, _,Profit_and_loss),
+    depreciation_between_start_date_and_other_date(Asset_cost,Method,Start_date,
+        Termination_date,Asset_id,_,1,false,_,0,Total_depreciation_value),
+    Correct_profit_and_loss is Termination_value - (Asset_cost - Total_depreciation_value),
+    assertion(floats_close_enough(Correct_profit_and_loss, Profit_and_loss)).
+

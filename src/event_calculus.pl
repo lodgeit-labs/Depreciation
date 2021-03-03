@@ -7,6 +7,7 @@
         depreciation_rate/6,
         asset/4,
         assert_asset/4,
+        assert_event/2,
         happens/2
     ]).
 
@@ -123,10 +124,10 @@ depreciationAsset(
     depreciationAsset(Asset_id,T2,T2,New_end_value,End_value,_,_,RestOfLife,While_in_pool,What_pool,New_initial_depreciation_value,Final_depreciation_value).
 
 /*
-Note: ‘Days held’ is the number of days you held the asset in the income year, 
+Note: ‘Days held’ is the number of days you held the asset in the income year,
 (the income year is a full financial year beginning on 1 July and ending on 30 June in Australia)
 in which you used it or had it installed ready for use for any purpose. Days held can be 366 for a leap year.*/
-depreciation_value(Method, Asset_cost, Asset_base_value, Days_held, Depreciation_rate, Depreciation_value) :- 
+depreciation_value(Method, Asset_cost, Asset_base_value, Days_held, Depreciation_rate, Depreciation_value) :-
     Days_held < 367,
 	(
 	Method == diminishing_value
@@ -134,6 +135,7 @@ depreciation_value(Method, Asset_cost, Asset_base_value, Days_held, Depreciation
 	;
 	Depreciation_value is Asset_cost * (Days_held / 365) * Depreciation_rate / 100
 	).
+
 
 % depreciation_rate(Asset/Pool, Method, Year_from_Start, Start_date, Effective_life_years, Rate).
 % If depreciation rate is not given, the generic calculation, for an individual Asset, is:
@@ -155,7 +157,7 @@ depreciation_rate(Asset, diminishing_value,_,Start_date,Effective_life_years, Ra
 % Depreciation for Assets in Pools
 % Depreciation rate for General Pool
 /*
-Small businesses can allocate depreciating assets that cost more than the instant asset write-off threshold of $20,000 
+Small businesses can allocate depreciating assets that cost more than the instant asset write-off threshold of $20,000
 (or cost) or more to their general small business pool to be depreciated at a rate of 15% in the year of allocation and
  30% in other income years on a diminishing value basis, irrespective of the effective life of the asset.
  */
@@ -171,8 +173,8 @@ depreciation_rate(software_pool,_, 5, Start_date,_,Rate):- (Start_date @>= date(
 % Depreciation rate for Low Value Pool
 /*
 You calculate the depreciation of all the assets in the low-value pool at the annual rate of 37.5%.
-If you acquire an asset and allocate it to the pool during an income year, you calculate its deduction at a rate of 18.75% 
-(that is, half the pool rate) in that first year. 
+If you acquire an asset and allocate it to the pool during an income year, you calculate its deduction at a rate of 18.75%
+(that is, half the pool rate) in that first year.
 This rate applies regardless of at what point during the year you allocate the asset to the pool.
 TODO:If asset is transfered to low value pool, then it can't leave the pool afterwards.
 Only low value or low cost assets can be allocated to a Low Value Pool
@@ -193,7 +195,7 @@ event(transfer_asset_to_pool(Asset_id, Pool)):- pool(Pool),asset(Asset_id,_,_,_)
 event(asset_disposal(Asset_id)):-asset(Asset_id,_,_,_).
 
 % an Asset can only be transferred in the beginning of an income year
-initiates(transfer_asset_to_pool(Asset_id, Pool), in_pool(Asset_id, Pool),T):- 
+initiates(transfer_asset_to_pool(Asset_id, Pool), in_pool(Asset_id, Pool),T):-
     time(T),
     begin_accounting_date(Begin_accounting_date),
     add_days(Begin_accounting_date,T,Date),
@@ -213,7 +215,7 @@ initially(not_in_pool(_)).
 asset(car456,2000,date(2015,3,16),8).*/
 
 days_from_begin_accounting(Date,Days):-
-    begin_accounting_date(Begin_accounting_date), 
+    begin_accounting_date(Begin_accounting_date),
     day_diff(Begin_accounting_date,Date,Days).
 
 % Transfer car123 to general pool in date(2017,7,1)
