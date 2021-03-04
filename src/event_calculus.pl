@@ -25,8 +25,9 @@ ec_cleanup :-
 	retractall(happens(_,_)),
 	retractall(asset(_,_,_,_)).
 
-assert_asset(Asset_id,Asset_cost,Start_date,Effective_life_years) :-
-	assertz(asset(Asset_id,Asset_cost,Start_date,Effective_life_years)).
+assert_asset(Asset_id, Asset_cost, Start_date, Effective_life_years) :-
+	assertz(
+		asset(Asset_id, Asset_cost, Start_date, Effective_life_years)).
 
 assert_event(Event, Days) :-
 	assertz(happens(Event, Days)).
@@ -82,7 +83,7 @@ depreciationAsset(
 ):-
     T1 < T2,
     (T2 - T1) < 367,
-    asset(Asset_id,Asset_cost,Start_date,Effective_life_years),
+    (asset(Asset_id,Asset_cost,Start_date,Effective_life_years)->true;throw_string('no such asset')),
     holdsAtAsset(Asset_id,H,T1),
     (	(H = in_pool(Asset_id,Pool))
     ->	depreciation_rate(Pool,     Method, Year_from_start, Start_date, Effective_life_years, Rate)
@@ -110,7 +111,7 @@ depreciationAsset(
 ):-
     T1 < T2,
     (T2 - T1) < 367,
-    asset(Asset_id,Asset_cost,Start_date,Effective_life_years),
+   (asset(Asset_id,Asset_cost,Start_date,Effective_life_years)->true;throw_string('no such asset')),
     holdsAtAsset(Asset_id,H,T1),
     (	(H = in_pool(Asset_id,Pool))
     ->	depreciation_rate(Pool,     Method, Year_from_start, Start_date, Effective_life_years, Rate)

@@ -79,6 +79,8 @@ depreciation_between_start_date_and_other_date(
 		Total_depreciation_value
 ) :-
 
+	%format(user_error,
+
 	/* is To_date >= From_Date? if no, the whole calculation fails. */
 	day_diff(date(From_year, From_Month, From_day), To_date, Request_period),
 	check_day_difference_validity(Request_period),

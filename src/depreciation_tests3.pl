@@ -21,7 +21,7 @@
 car123_2 :-
 	days_from_begin_accounting(date(2017,05,01), D1),
 	assert_asset(car123,1000,D1,5),
-
+/*delete this whole?*/
 	days_from_begin_accounting(date(2017,6,1),D3),
 	assert_event(transfer_asset_to_pool(car123,general_pool),D3),
 
@@ -33,7 +33,10 @@ car123_2 :-
 :- begin_tests(depreciation_computation3, [setup(car123_2), cleanup(ec_cleanup)]).
 
 
-test(depreciation_between_start_date_and_other_date_all_life,[all(x=[x])],broken('can only add asset to pool at beginning of income year')]):-
+test(depreciation_between_start_date_and_other_date_all_life,[
+	all(x=[x]),
+	blocked('can only add asset to pool at beginning of income year')
+]):-
     /*
     asset: car123, start depreciation date: 2017-5-1, cost: 1000, effective life years defined: 5
     Method: diminishing value
@@ -56,6 +59,10 @@ test(depreciation_between_start_date_and_other_date_all_life,[all(x=[x])],broken
     depreciation_between_start_date_and_other_date(1000,diminishing_value,date(2017,5,1),
         date(2019,10,2),car123,_,1,false,_,0,Total_depreciation_value),
     assertion(floats_close_enough(Total_depreciation_value, 577.6746187406319)).
+
+
+
+
 
 :- end_tests(depreciation_computation3).
 
