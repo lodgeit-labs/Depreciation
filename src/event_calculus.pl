@@ -55,22 +55,49 @@ holdsAtAsset(Asset_id,in_pool(Asset_id,Pool),T):- holdsAt(in_pool(Asset_id,Pool)
 holdsAtAsset(Asset_id,not_in_pool(Asset_id),T):- holdsAt(not_in_pool(Asset_id),T).
 
 
-/* this should be called maybe depreciation_within_income_year */
+/*
+term(depreciation_within_income_year,[
+	asset_id,
+	T2 - [
+		note("start day or day before start day?")],
+	T2 - [
+		note("end day or day before end day?")],
+	beginning_asset_value,
+	ending_asset_value,
+	method,
+	year_from_start - [
+		note("the n-th year of this asset's life"),
+		min(1)],
+	phases - [
+		type(list(phase))],
+	while_in_pool - [
+		note("probably a boolean, not sure if specifying that the asset was in pool through the whole time, or further limiting the time")],
+	what_pool,
+	initial_depreciation_value % _written_off_value?,
+	final_depreciation_value
+ */
+
 
 % if the start date is also the end date, final values = initial values
+
 depreciationAsset(
-	_Asset_id,
+	_,
+	T1,
 	T2,
-	T2,
+	Begin_value,
 	End_value,
-	End_value,
-	_Method,
-	_Year_from_start,
+	_,
+	_,
 	[], % Life
-	_While_in_pool,
-	_What_pool,
-	Final_depreciation_value,
-	Final_depreciation_value).
+	_,
+	_,
+	Initial_depreciation_value,
+	Final_depreciation_value
+) :-
+	T1 = T2,
+	Begin_value = End_value,
+	Initial_depreciation_value = Final_depreciation_value.
+
 
 /* this is for the case when the income year is split by an event, ie, removal from pool or adding to pool */
 depreciationAsset(
@@ -126,6 +153,9 @@ depreciationAsset(
     /* this is not a recursion, invoke the base case, just copy values */
     depreciationAsset(Asset_id,T2,T2,New_end_value,End_value,_,_,RestOfLife,While_in_pool,What_pool,New_initial_depreciation_value,Final_depreciation_value).
 
+
+
+
 /*
 Note: ‘Days held’ is the number of days you held the asset in the income year,
 (the income year is a full financial year beginning on 1 July and ending on 30 June in Australia)
@@ -140,14 +170,26 @@ depreciation_value(Method, Asset_cost, Asset_base_value, Days_held, Depreciation
 	).
 
 
-% depreciation_rate(Asset/Pool, Method, Year_from_Start, Start_date, Effective_life_years, Rate).
+
+
+term(depreciation_rate,
+[
+	asset_or_pool,
+	method,
+	year_from_start - [
+		note("the n-th year of this asset's life, or of its pool membership"y,
+		min(1)],
+	start_date,
+	effective_life_years,
+	rate
+]
+	).
+
 % If depreciation rate is not given, the generic calculation, for an individual Asset, is:
-%The income year is a full financial year beginning on 1 July and ending 30 June in Australia
 
 depreciation_rate(Asset, prime_cost,_,_,Effective_life_years, Rate) :-
 	not(pool(Asset)),
 	Rate is 100 * 1 / Effective_life_years.
-
 
 depreciation_rate(Asset, diminishing_value,_,Start_date,Effective_life_years, Rate) :-
 	not(pool(Asset)),
@@ -165,6 +207,7 @@ Small businesses can allocate depreciating assets that cost more than the instan
 (or cost) or more to their general small business pool to be depreciated at a rate of 15% in the year of allocation and
  30% in other income years on a diminishing value basis, irrespective of the effective life of the asset.
  */
+
 depreciation_rate(general_pool,diminishing_value,1,_,_,15).
 depreciation_rate(general_pool,diminishing_value,Year,_,_,30):- Year #> 1.
 
@@ -185,7 +228,7 @@ This rate applies regardless of at what point during the year you allocate the a
 Only low value or low cost assets can be allocated to a Low Value Pool
 */
 depreciation_rate(low_value_pool,_,1,_,_,18.75).
-depreciation_rate(low_value_pool,_,Year,_,_,37.5):- Year > 1.
+depreciation_rate(low_value_pool,_,Year,_,_,37.5):- Year #> 1.
 % For debugging
 %start:-depreciationInInterval(car123,1000,date(2017,8,1),0,20,800,_,diminishing_value,1,5,Result,0,Total_depreciation).
 
@@ -205,7 +248,7 @@ initiates(transfer_asset_to_pool(Asset_id, Pool), in_pool(Asset_id, Pool),T):-
     time(T),
     begin_accounting_date(Begin_accounting_date),
     add_days(Begin_accounting_date,T,Date),
-    begin_income_year(Date),
+    begin_income_year(Date), % throw?
     asset(Asset_id,_,_,_),
     pool(Pool).
 initiates(asset_disposal(Asset_id), not_in_pool(Asset_id),T):- time(T),asset(Asset_id,_,_,_).
@@ -270,3 +313,5 @@ start:-depreciationAsset(car456,0,9,1000,End_value,prime_cost,1,Life,false,_,0,F
 %findall((Asset_id,Depreciation_value),depreciationAsset(Asset_id,0,9,1000,End_value,prime_cost,1,Life,true,general_pool,0,Depreciation_value),Result).
 
 */
+
+%The income year is a full financial year beginning on 1 July and ending 30 June in Australia

@@ -1,4 +1,4 @@
-# I'm sending you the event_calculus2.pl, it's the 2nd version that uses constraint programming properly (applied to another domain - invoices), one can get all the life of some asset in a list output using this, but one would need to parse this list from the start again for depreciation calculations, so it wouldn't bring any benefit.
+# I'm sending you the event_calculus2.pl, it's the 2nd version that uses constraint programming properly (applied to another domain - invoices), one can get all the life of some asset in a list output using this, but one would need to parse this list from the start again for depreciation calculations, so it wouldn't bring any benefit.
 
 :- dynamic happens/2, invoice/5.
 :- use_module(library(clpfd)).
