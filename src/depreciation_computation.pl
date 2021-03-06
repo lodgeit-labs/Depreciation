@@ -2,6 +2,10 @@
 
 ISSUES THAT NEED REVIEW:
 
+ISSUE -1:
+some mismatches between date terms and day ints. It'd be best to convert into days with 'ecd'/2 before calling any depreciation predicates.
+
+
 ISSUE 0:
 tests are failing, probably because of some small changes
 
@@ -182,6 +186,9 @@ depreciation_pool_from_start(Pool,To_date,Method,Total_depreciation):-
 depreciation_pool_from_start2(To_date,Method,Pool,Depreciation_value) :-
 	%asset(car123,1000,date(2017,5,1),5).
 	asset(Asset_id,Cost,Asset_Start_date,_),
+	/* fixme: we supply an int for Asset_Start_date,
+	and we should deal with ints exclusively
+	 */
 	day_diff(Asset_Start_date,To_date,Days_diff),
 	Days_diff>0,
 	/* for every asset purchased before To_date */

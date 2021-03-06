@@ -41,7 +41,7 @@ test(depreciation_rate_general_pool_fail, fail) :-
     Effective_life_years = 5,
     Start_date = date(2017,1,1),
     Year_from_start = 1,
-    depreciation_rate(Asset_id, Method,Year_from_start,Start_date,Effective_life_years, Rate).
+    depreciation_rate(Asset_id, Method,Year_from_start,Start_date,Effective_life_years, _Rate).
 
 
 :- end_tests(depreciation_rate).
@@ -53,7 +53,7 @@ test(depreciation_rate_general_pool_fail, fail) :-
 
 test(depreciation_value_prime_cost0, all(x=[x])) :-
 	% Depreciation_value is Asset_cost * (Days_held / 365) * Depreciation_rate
-	trc(depreciation_value(prime_cost, 1000, 800, 200, 0.2, Depreciation_value)),
+	depreciation_value(prime_cost, 1000, 800, 200, 0.2, Depreciation_value),
 	assertion(floats_close_enough(Depreciation_value, 1.0958904109589042)).
 
 

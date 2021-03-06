@@ -161,6 +161,7 @@ Note: ‘Days held’ is the number of days you held the asset in the income yea
 (the income year is a full financial year beginning on 1 July and ending on 30 June in Australia)
 in which you used it or had it installed ready for use for any purpose. Days held can be 366 for a leap year.*/
 depreciation_value(Method, Asset_cost, Asset_base_value, Days_held, Depreciation_rate, Depreciation_value) :-
+	/*well this is just ..bad*/
     Days_held < 367,
 	(
 	Method == diminishing_value
@@ -171,7 +172,7 @@ depreciation_value(Method, Asset_cost, Asset_base_value, Days_held, Depreciation
 
 
 
-
+/*
 term(depreciation_rate,
 [
 	asset_or_pool,
@@ -184,7 +185,7 @@ term(depreciation_rate,
 	rate
 ]
 	).
-
+*/
 % If depreciation rate is not given, the generic calculation, for an individual Asset, is:
 
 depreciation_rate(Asset, prime_cost,_,_,Effective_life_years, Rate) :-
@@ -263,9 +264,15 @@ initially(not_in_pool(_)).
 /*asset(car123,1000,date(2017,5,1),5).
 asset(car456,2000,date(2015,3,16),8).*/
 
+/* event calculus days.
+ user-facing pred which makes sure that the existence of an event on the given date can be represented */
+ecd(Date, Days) :-
+	days_from_begin_accounting(Date,Days),
+	(Days > 0 -> true ; throw_string('date is too early')).
+
 days_from_begin_accounting(Date,Days):-
-    begin_accounting_date(Begin_accounting_date),
-    day_diff(Begin_accounting_date,Date,Days).
+	begin_accounting_date(Begin_accounting_date),
+	day_diff(Begin_accounting_date,Date,Days).
 
 % Transfer car123 to general pool in date(2017,7,1)
 % days_from_begin_accounting(date(2017,7,1),Days).
