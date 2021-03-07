@@ -161,7 +161,6 @@ Note: ‘Days held’ is the number of days you held the asset in the income yea
 (the income year is a full financial year beginning on 1 July and ending on 30 June in Australia)
 in which you used it or had it installed ready for use for any purpose. Days held can be 366 for a leap year.*/
 depreciation_value(Method, Asset_cost, Asset_base_value, Days_held, Depreciation_rate, Depreciation_value) :-
-pool(P),
 	/*well this is just ..bad*/
     Days_held < 367,
 	(

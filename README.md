@@ -10,7 +10,6 @@
 
 ### running depreciation computations outside of Robust source tree:
 ```
-swipl -s ../../master2/sources/public_lib/lodgeit_solvers/prolog/utils/utils.pl depreciation_tests.pl
-% PL-Unit: depreciation ....
-...
+cd src;
+swipl -s all_tests.pl -g run_tests
 ```
