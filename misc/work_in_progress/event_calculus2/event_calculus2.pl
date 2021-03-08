@@ -1,4 +1,4 @@
-# I'm sending you the event_calculus2.pl, it's the 2nd version that uses constraint programming properly (applied to another domain - invoices), one can get all the life of some asset in a list output using this, but one would need to parse this list from the start again for depreciation calculations, so it wouldn't bring any benefit.
+# I'm sending you the event_calculus2.pl, it's the 2nd version that uses constraint programming properly (applied to another domain - invoices), one can get all the life of some asset in a list output using this, but one would need to parse this list from the start again for depreciation calculations, so it wouldn't bring any benefit.
 
 :- dynamic happens/2, invoice/5.
 :- use_module(library(clpfd)).
@@ -50,14 +50,6 @@ fluent(checking(Invoice_id)).
 fluent(checked(Invoice_id)).
 fluent(sent(Invoice_id)).
 
-%List of possible events
-event(begin_planning(Invoice_id)).
-event(finish_planning(Invoice_id)).
-event(begin_preparing(Invoice_id)).
-event(finish_preparing(Invoice_id)).
-event(begin_checking(Invoice_id)).
-event(finish_checking(Invoice_id)).
-event(send(Invoice_id)).
 
 % Invoice has these fields:
 % invoice(Invoice_id,How_much,For_what,Other_info,Person_checking)
@@ -85,13 +77,20 @@ invoice(123,_,_,_,_).
 % Previous list of authorized persons
 authorized(bob).
 % happens(Event,Time).
-happens(begin_planning(123),5).
-happens(finish_planning(123,1000,service_A),10).
-happens(begin_preparing(123),12).
-happens(finish_preparing(123,other_important_info),14).
-happens(begin_checking(123,bob),15).
-happens(finish_checking(123,bob),17).
-happens(send(123),18).
+happens(begin_planning(123),
+5).
+happens(finish_planning(123,1000,service_A),
+10).
+happens(begin_preparing(123),
+12).
+happens(finish_preparing(123,other_important_info),
+14).
+happens(begin_checking(123,bob),
+15).
+happens(finish_checking(123,bob),
+17).
+happens(send(123),
+18).
 
 % some queries to check what holds at what time
 %holdsAt(sent(123),19).
@@ -107,3 +106,16 @@ happens(send(123),18).
 %holdsIntervals(checked(123),T1,T2).
 %holdsIntervals(planning(123),T1,T2).
 %findall((F,T1,T2),holdsIntervals(F,T1,T2),Results).
+
+
+
+%List of possible events, unused
+/*
+event(begin_planning(Invoice_id)).
+event(finish_planning(Invoice_id)).
+event(begin_preparing(Invoice_id)).
+event(finish_preparing(Invoice_id)).
+event(begin_checking(Invoice_id)).
+event(finish_checking(Invoice_id)).
+event(send(Invoice_id)).
+*/

@@ -2,8 +2,14 @@
 
 ISSUES THAT NEED REVIEW:
 
+ISSUE -1:
+some mismatches between date terms and day ints. It'd be best to convert into days with 'ecd'/2 before calling any depreciation predicates.
+
+
 ISSUE 0:
 tests are failing, probably because of some small changes
+
+
 
 ISSUE 1:
 * one thing that confuses me is that it seems that if you have an asset, let's say purchased in 2010, and at 2017 you add it to a pool, then depreciation_pool_from_start will compute with the full purchase price of the asset, like if it wasnt already depreciating before it was added to the pool.
@@ -11,22 +17,36 @@ ISSUE 1:
 - I have this comment in  depreciationAsset(...) predicate: %reduce end value even if not in specified pool, so that when in pool the begin value is correct
 so when asked while in Pool, even if it starts later in pool, the calculation begins over the depreciated value outside the pool
 * It can be seen by taking the default depreciation template and running it, then changing car456 purchase date and running again.
- that doesn't sound right, right? tnat you can only add an asset to the pool at beginning of income year, but it spends a day outside of the pool
-- That can be changed easily, it was only a convention in event calculus (any event only makes something hold from the next day on forward), I had doubt too if it was the best option so I get you!
+
+
 
 ISSUE 2
 * another thing that doesnt seem right is that if asset is added to pool on 01/07/xxxx,
 depreciationAsset produces two life periods, the first has 1 day
 * If it is added on the first day it is only in the pool in the next day, so first day is outside the pool with other depreciation rules
+ * you can only add an asset to the pool at beginning of income year, but it spends a day (the first day?) outside of the pool
+- That can be changed easily, it was only a convention in event calculus (any event only makes something hold from the next day on forward), I had doubt too if it was the best option so I get you!
+- ok, so we should interpret the date as "beginning with"
+
+
+
+?
 - I don't understand it either... I have to check it with more time... Also, the depreciation module needs a refactoring since I wasnt using event calculus to its fullest in it... afterward I have improved event calculus to fully take advantage of library(clpfd) and shared it with Andrew
 	the code would look simpler with this and more understandable
 ^ this means that we have an improved "event calculus" code somewhere, but have not rewritten this depreciation code to make use of it.
 
 
-
 ISSUE 3
-
 fix profit_and_loss capital gain calculation(below) (was added recently).
+
+ISSUE 4:
+you can only add an asset to the pool at beginning of income year. this must be enforced. <=
+
+ISSUE 5:
+If asset is transfered to low value pool, then it can't leave the pool afterwards.
+
+ISSUE 6:
+If asset is transfered to low value pool, then it must not be allowed to leave the pool afterwards.
 
 */
 
@@ -38,13 +58,12 @@ fix profit_and_loss capital gain calculation(below) (was added recently).
 	depreciation_between_two_dates/5,
 	profit_and_loss/6]).
 
-:- use_module(event_calculus, [depreciationAsset/12,asset/4]).
+:- use_module(event_calculus, [depreciationAsset/12,asset/4,begin_accounting_date/1]).
 :- use_module(library(lists)).
 
-begin_accounting_date(date(1990,1,1)).
 
 % Calculates depreciation on a daily basis between the invest in date and any other date
-% recurses for every income year, because depreciation rates may be different
+% recurses for every income year, because depreciation rates may be different each year
 /*
 total depreciation at To_date is the sum of:
 	depreciation until start of income year following start
@@ -53,7 +72,7 @@ total depreciation at To_date is the sum of:
 depreciation_between_start_date_and_other_date(
 		Initial_value, 							% value at start of year / Asset Base Value
 		Method, 								% Diminishing Value / Prime Cost
-		date(From_year, From_Month, From_day),
+		date(From_year, From_Month, From_day),  % Start depreciation date
 		To_date,								% date for which depreciation should be computed
 		Asset_id,								% Asset
 		[Life|RestOfLife],
@@ -63,6 +82,8 @@ depreciation_between_start_date_and_other_date(
 		Initial_depreciation_value,
 		Total_depreciation_value
 ) :-
+
+	%format(user_error,
 
 	/* is To_date >= From_Date? if no, the whole calculation fails. */
 	day_diff(date(From_year, From_Month, From_day), To_date, Request_period),
@@ -165,6 +186,9 @@ depreciation_pool_from_start(Pool,To_date,Method,Total_depreciation):-
 depreciation_pool_from_start2(To_date,Method,Pool,Depreciation_value) :-
 	%asset(car123,1000,date(2017,5,1),5).
 	asset(Asset_id,Cost,Asset_Start_date,_),
+	/* fixme: we supply an int for Asset_Start_date,
+	and we should deal with ints exclusively
+	 */
 	day_diff(Asset_Start_date,To_date,Days_diff),
 	Days_diff>0,
 	/* for every asset purchased before To_date */
