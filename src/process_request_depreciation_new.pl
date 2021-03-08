@@ -66,7 +66,10 @@ process_depreciation_query2(
 		$>atom_string(<$, $>doc_value(Q,
 			depr:depreciation_query_pool)),
 		% to-date (date)
+
+		% FINISHME: this is how all dates should be passed.
 		$>ecd($>doc_value(Q, depr:depreciation_query_to_date)),
+
 		$>depreciation_query_method(Q),
 		$>doc_add_value(Q,
 			depr:depreciation_query_total_depreciation)
