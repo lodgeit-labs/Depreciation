@@ -7,8 +7,7 @@ some mismatches between date terms and day ints. It'd be best to convert into da
 
 
 ISSUE 0:
-tests are failing, probably because of some small changes
-
+tests are failing, probably because of some small changes / they're outdated
 
 
 ISSUE 1:
@@ -43,9 +42,6 @@ ISSUE 4:
 you can only add an asset to the pool at beginning of income year. this must be enforced. <=
 
 ISSUE 5:
-If asset is transfered to low value pool, then it can't leave the pool afterwards.
-
-ISSUE 6:
 If asset is transfered to low value pool, then it must not be allowed to leave the pool afterwards.
 
 */
