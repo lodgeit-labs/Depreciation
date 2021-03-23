@@ -265,6 +265,9 @@ initially(not_in_pool(_)).
 asset(car456,2000,date(2015,3,16),8).*/
 
 /* event calculus days.
+
+TODO, this should be used everywhere
+
  user-facing pred which makes sure that the existence of an event on the given date can be represented */
 ecd(Date, Days) :-
 	days_from_begin_accounting(Date,Days),

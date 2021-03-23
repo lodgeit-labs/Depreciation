@@ -8,16 +8,21 @@
 	asset/4
 ]).
 
-:- begin_tests(depreciation_rate).
-
-
-test(depreciation_rate_prime_cost, all(x=[x])) :-
+t0 :-
     Method = prime_cost,
     Asset_id = car123,
     Effective_life_years = 5,
     depreciation_rate(Asset_id, Method,_,_,Effective_life_years, Rate),
     assertion(Rate == 20).
 
+
+:- begin_tests(depreciation_rate).
+
+
+test(depreciation_rate_prime_cost, all(x=[x])) :-
+	t0.
+	
+	
 test(depreciation_rate_diminishing_value) :-
     Method = diminishing_value,
     Asset_id = car123,
