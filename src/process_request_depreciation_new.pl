@@ -1,5 +1,7 @@
 :- use_module(depreciation_computation, []).
+:- use_module(event_calculus, [ecd/2]).
 
+/* todo needs dates converted to *absolute* days here. days_from_begin_accounting must be dropped. */
 
 process_request_depreciation_new :-
 	request_data(D),
@@ -35,16 +37,14 @@ process_depreciation_asset(I) :-
 process_depreciation_event(I) :-
 	doc_value(I, depr:depreciation_event_has_type, Type),
 	doc_value(I, depr:depreciation_event_asset, Asset),
-	doc_value(I, depr:depreciation_event_date, Date),
-	days_from_begin_accounting(Date, Days),
 	(	rdf_equal2(Type, depr:transfer_asset_to_pool)
 	->	atom_string(Pool, $>doc_value(I, depr:depreciation_event_pool)),
-		(	begin_income_year(Date)
-		->	true
-		;	throw_string('can only transfer asset to pool on beginning of income year')),
-		!event_calculus:assert_event(transfer_asset_to_pool(Asset,Pool),Days)
+		Event = transfer_asset_to_pool(Asset,Pool)
 	;	assertion(rdf_equal2(Type, depr:asset_disposal)),
-		!event_calculus:assert_event(asset_disposal(Asset),Days)).
+		Event = asset_disposal(Asset)),
+	doc_value(I, depr:depreciation_event_date, Date),
+	ecd(Date, Days),
+	!event_calculus:assert_event(Event,Days).
 
 
 

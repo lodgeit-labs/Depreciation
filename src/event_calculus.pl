@@ -2,6 +2,7 @@
 :- module(event_calculus, [
 		begin_income_year/1,
 		days_from_begin_accounting/2,
+		ecd/2,
         depreciationAsset/12,
         depreciation_value/6,
         depreciation_rate/6,
@@ -30,11 +31,19 @@ assert_asset(Asset_id, Asset_cost, Start_date, Effective_life_years) :-
 		asset(Asset_id, Asset_cost, Start_date, Effective_life_years)).
 
 assert_event(Event, Days) :-
+	(	Event = transfer_asset_to_pool(_, _)
+	->	(	begin_income_year_days(Days)
+		->	true
+		;	throw_string('can only transfer asset to pool on beginning of income year'))
+	;	true),
 	assertz(happens(Event, Days)).
 
 
 begin_accounting_date(date(1990,1,1)).
 begin_income_year(date(_,7,1)).
+begin_income_year_days(Days) :-
+	gregorian_date(Days, Date),
+	begin_income_year(Date).
 
 
 % Define constraint in days, max 100000 days
