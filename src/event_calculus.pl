@@ -280,7 +280,9 @@ TODO, this should be used everywhere
  user-facing pred which makes sure that the existence of an event on the given date can be represented */
 ecd(Date, Days) :-
 	days_from_begin_accounting(Date,Days),
-	(Days > 0 -> true ; throw_string('date is too early')).
+	(	Days > 0
+	->	true
+	;	throw_string('date is too early')).
 
 days_from_begin_accounting(Date,Days):-
 	begin_accounting_date(Begin_accounting_date),
