@@ -4,18 +4,22 @@
 /* todo needs dates converted to *absolute* days here. days_from_begin_accounting must be dropped. */
 
 process_request_depreciation_new :-
-	request_data(D),
-	doc_value(D, depr_ui:depreciation_queries, _),
 
-	(	maplist(process_depreciation_asset, $> doc_list_items($> doc_value(D, depr_ui:depreciation_assets)))
+	?get_singleton_sheet(depr_ui:depreciation_queries, Queries_sheet),
+	, Queries_Data).
+	doc_add(Queries_sheet, excel:is_result_sheet, true),
+	!get_singleton_sheet(depr_ui:depreciation_assets,  Assets_sheet),
+
+
+	(	maplist(process_depreciation_asset, $> doc_list_items($> !doc(Assets_sheet, excel:sheet_instance_has_sheet_data)))
 	->	true
 	;	throw_string('depreciation: assets processing failed')),
 
 	% events sheet is optional
 	(
 		(
-			doc_value(D, depr_ui:depreciation_events, Events),
-			doc_list_items(Events,Events_items)
+			?get_optional_singleton_sheet_data(depr_ui:depreciation_events, Events_sheet),
+			doc_list_items(Events, Events_items)
 		)
 	->	(	maplist(process_depreciation_event, Events_items)
 		->	true
@@ -23,9 +27,12 @@ process_request_depreciation_new :-
 	;	true
 	),
 
-	(	maplist(process_depreciation_query, $> doc_list_items($> doc_value(D, depr_ui:depreciation_queries)))
+	(	maplist(process_depreciation_query, $> doc_list_items($> !doc(Queries_sheet, excel:sheet_instance_has_sheet_data)))
 	->	true
-	;	throw_string('depreciation: queries processing failed')).
+	;	throw_string('depreciation: queries processing failed')),
+
+
+	true.
 
 process_depreciation_asset(I) :-
 	event_calculus:assert_asset(
