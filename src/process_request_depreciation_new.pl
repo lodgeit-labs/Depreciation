@@ -18,7 +18,7 @@ process_request_depreciation_new :-
 	% events sheet is optional
 	(
 		(
-			?get_optional_singleton_sheet_data(depr_ui:depreciation_events, Events_sheet),
+			?get_optional_singleton_sheet_data(depr_ui:depreciation_events, Events_sheet, Events),
 			doc_list_items(Events, Events_items)
 		)
 	->	(	maplist(process_depreciation_event, Events_items)
@@ -31,6 +31,7 @@ process_request_depreciation_new :-
 	->	true
 	;	throw_string('depreciation: queries processing failed')),
 
+	add_result_sheets_report($>doc_default_graph),
 
 	true.
 
