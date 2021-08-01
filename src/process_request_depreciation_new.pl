@@ -5,20 +5,18 @@
 
 process_request_depreciation_new :-
 
-	?get_singleton_sheet(depr_ui:depreciation_queries, Queries_sheet),
-	, Queries_Data).
-	doc_add(Queries_sheet, excel:is_result_sheet, true),
-	!get_singleton_sheet(depr_ui:depreciation_assets,  Assets_sheet),
+	?get_optional_singleton_sheet(depr_ui:depreciation_calculator_sheet_queries, Queries_sheet),
+	!doc_add(Queries_sheet, excel:is_result_sheet, true),
+	!get_singleton_sheet_data(depr_ui:depreciation_calculator_sheet_assets,  Assets_data),
 
-
-	(	maplist(process_depreciation_asset, $> doc_list_items($> !doc(Assets_sheet, excel:sheet_instance_has_sheet_data)))
+	(	maplist(process_depreciation_asset, $> doc_list_items(Assets_data))
 	->	true
 	;	throw_string('depreciation: assets processing failed')),
 
 	% events sheet is optional
 	(
 		(
-			?get_optional_singleton_sheet_data(depr_ui:depreciation_events, Events_sheet, Events),
+			?get_optional_singleton_sheet_data(depr_ui:depreciation_calculator_sheet_events, Events),
 			doc_list_items(Events, Events_items)
 		)
 	->	(	maplist(process_depreciation_event, Events_items)
